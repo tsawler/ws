@@ -12,17 +12,20 @@ import (
 func Test_New(t *testing.T) {
 	s := New()
 	if reflect.TypeOf(s).String() != "*ws.Sockets" {
-		t.Error("wrong type; got", reflect.TypeOf(s))
+		t.Errorf("wrong type; expected %s but got %s", "*ws.Sockets", reflect.TypeOf(s).String())
 	}
 	if reflect.TypeOf(s.ClientChan).String() != "chan ws.WsPayload" {
-		t.Error("wrong type; got", reflect.TypeOf(s))
+		t.Errorf("wrong type; expected %s but got %s", "chan ws.WsPayload", reflect.TypeOf(s.ClientChan).String())
+	}
+	if reflect.TypeOf(s.Clients).String() != "map[ws.WebSocketConnection]string" {
+		t.Errorf("wrong type; expected %s but got %s", "map[ws.WebSocketConnection]string", reflect.TypeOf(s.Clients).String())
 	}
 }
 
 func TestWebSocketConnection(t *testing.T) {
 	testWS := New()
 
-	// Create test serverl
+	// Create test server.
 	s := httptest.NewServer(http.HandlerFunc(testWS.SocketEndPoint))
 	defer s.Close()
 
