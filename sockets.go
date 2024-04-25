@@ -56,11 +56,11 @@ func (s *Sockets) SocketEndPoint(w http.ResponseWriter, r *http.Request) {
 	Clients[conn] = ""
 
 	// Start listening for this client.
-	go ListenForWS(&conn)
+	go listenForWS(&conn)
 }
 
-// ListenForWS is the goroutine that listens for communication from Clients.
-func ListenForWS(conn *WebSocketConnection) {
+// listenForWS is the goroutine that listens for communication from Clients.
+func listenForWS(conn *WebSocketConnection) {
 	// If this dies, just restart it.
 	defer func() {
 		if r := recover(); r != nil {
