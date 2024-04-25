@@ -1,4 +1,4 @@
-module github.com/tsawler/sockets
+module github.com/tsawler/ws
 
 go 1.22
 

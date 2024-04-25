@@ -1,4 +1,4 @@
-package sockets
+package ws
 
 import (
 	"fmt"
