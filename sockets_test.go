@@ -29,7 +29,7 @@ func TestWebSocketConnection(t *testing.T) {
 	s := httptest.NewServer(http.HandlerFunc(testWS.SocketEndPoint))
 	defer s.Close()
 
-	// Convert http://127.0.0.1 to ws://127.0.0.
+	// Convert http:// to ws://.
 	u := "ws" + strings.TrimPrefix(s.URL, "http")
 
 	// Connect to the server.
@@ -54,20 +54,29 @@ func TestWebSocketConnection(t *testing.T) {
 	// Broadcast it.
 	testWS.BroadcastToAll(payload)
 
-	_, _, err = ws.ReadMessage()
+	// Read response.
+	messageType, b, err := ws.ReadMessage()
 	if err != nil {
 		t.Fatalf("%v", err)
+	}
+
+	if messageType != 1 {
+		t.Errorf("wrong message type; expected 1 but got %d", messageType)
+	}
+
+	if !strings.Contains(string(b), `"message":"hi"`) {
+		t.Errorf("wrong response; expected %s but got %s", `{"message":"hi"}`, string(b))
 	}
 }
 
 func Test_ListenToWsChannel(t *testing.T) {
 	testWS := New()
 
-	// Create test serverl
+	// Create test server.
 	s := httptest.NewServer(http.HandlerFunc(testWS.SocketEndPoint))
 	defer s.Close()
 
-	// Convert http://127.0.0.1 to ws://127.0.0.
+	// Convert http//: to ws://.
 	u := "ws" + strings.TrimPrefix(s.URL, "http")
 
 	// Connect to the server.
@@ -87,11 +96,16 @@ func Test_ListenToWsChannel(t *testing.T) {
 	// fire off
 	go testWS.ListenToWsChannel()
 
-	for k, _ := range testWS.Clients {
-		payload := WsPayload{
-			Message: "Hello",
-			Conn:    k,
-		}
-		testWS.ClientChan <- payload
+	payload := WsPayload{
+		Message: "Hello",
+		Conn:    WebSocketConnection{ws},
 	}
+	testWS.ClientChan <- payload
+
+	_, b, err := ws.ReadMessage()
+	if err != nil {
+		t.Error("failed to read")
+	}
+
+	t.Log("Bytes", string(b))
 }
