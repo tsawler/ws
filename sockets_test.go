@@ -79,7 +79,7 @@ func Test_ListenToWsChannel(t *testing.T) {
 	}
 	defer ws.Close()
 
-	// fire off
+	// fire off ListenToWsChannel.
 	go testWS.ListenToWsChannel()
 
 	payload := Payload{
