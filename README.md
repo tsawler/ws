@@ -28,7 +28,7 @@ The ws.Sockets type has three fields:
 // Sockets is the main type for this library.
 type Sockets struct {
     ClientChan chan Payload // The channel that receives messages.
-    Clients    map[WebSocketConnection]string // A map of connected clients.
+    Clients    map[WebSocketConnection]any // A map of connected clients.
     ErrorChan  chan error // A channel to send errors to.
 }
 ~~~
