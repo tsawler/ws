@@ -5,7 +5,7 @@
 
 # ws
 
-Package ws is a simple library that makes it simple to use WebSockets (specifically 
+Package ws is a simple library that makes it easy to use WebSockets (specifically 
 [Gorilla Websockets](https://github.com/gorilla/websocket)) in your Go application.
 
 ## Installation
