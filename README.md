@@ -35,7 +35,7 @@ The ws.Sockets type has the following exposed methods:
 
 ~~~go
 SocketEndPoint(w http.ResponseWriter, r *http.Request) // A handler for the websocket endpoint.
-ListenToWsChannel() // A goroutine that listens to the SocketsChan and pushes data to broadcast function
+ListenToWsChannel() // A goroutine that listens to the SocketsChan and pushes data to broadcast function.
 BroadcastTextToAll(payload JSONResponse) // Pushes textual data to all connected clients.
 BroadcastJSONToAll(payload JSONResponse) // Pushes JSON data to all connected clients.
 ~~~
