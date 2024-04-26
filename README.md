@@ -42,7 +42,7 @@ BroadcastTextToAll(payload JSONResponse) // Pushes textual data to all connected
 BroadcastJSONToAll(payload JSONResponse) // Pushes JSON data to all connected clients.
 ~~~
 
-1. `SocketEndPoint`: You'll need a handler to listen for (and upgrade) http(s) connections to ws(s) connections`. 
+1. `SocketEndPoint`: You'll need a handler to listen for (and upgrade) http(s) connections to ws(s) connections. 
 This is what client side javascript will connect to.
 2. `ListenToWsChannel`: Run this concurrently() as a goroutine. It listens to the Clients field
 in the `Sockets` type and sends client payloads to the appropriate broadcast method.
