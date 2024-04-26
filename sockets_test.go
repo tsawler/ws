@@ -121,6 +121,16 @@ func Test_ListenToWsChannel(t *testing.T) {
 }
 
 func Test_listenForWS(t *testing.T) {
+
+	tests := []struct {
+		name           string
+		messageType    int
+		expectResponse bool
+	}{
+		{name: "valid", messageType: TextMessage, expectResponse: true},
+		{name: "valid", messageType: JSONMessage, expectResponse: true},
+		{name: "invalid", messageType: 3, expectResponse: false},
+	}
 	// Create test server.
 	s := httptest.NewServer(http.HandlerFunc(testWS.SocketEndPoint))
 	defer s.Close()
@@ -136,11 +146,28 @@ func Test_listenForWS(t *testing.T) {
 	defer ws.Close()
 
 	go testWS.listenForWS(&WebSocketConnection{ws})
-	payload := Payload{
-		Message: "",
-	}
-	err = ws.WriteJSON(payload)
-	if err != nil {
-		t.Fatalf("%v", err)
+
+	for _, tt := range tests {
+		payload := Payload{
+			MessageType: tt.messageType,
+			Message:     "Hello",
+		}
+		err = ws.WriteJSON(payload)
+		if err != nil {
+			t.Fatalf("%v", err)
+		}
+
+		if tt.expectResponse {
+			_, b, err := ws.ReadMessage()
+			if err != nil {
+				t.Error("failed to read")
+			}
+
+			if !strings.Contains(string(b), "Hello") {
+				if err != nil {
+					t.Error("response JSON does not have correct text")
+				}
+			}
+		}
 	}
 }
