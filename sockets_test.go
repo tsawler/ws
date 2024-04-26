@@ -47,7 +47,7 @@ func TestWebSocketConnection(t *testing.T) {
 	}
 
 	// Create a payload.
-	payload := JsonResponse{
+	payload := JSONResponse{
 		Message: "hi",
 	}
 

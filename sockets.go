@@ -40,8 +40,8 @@ type Payload struct {
 	Conn        WebSocketConnection `json:"-"`
 }
 
-// JsonResponse defines the json we send back to client
-type JsonResponse struct {
+// JSONResponse defines the JSON we send back to client
+type JSONResponse struct {
 	Message     string              `json:"message"`
 	CurrentConn WebSocketConnection `json:"-"`
 }
@@ -104,14 +104,16 @@ func (s *Sockets) ListenToWsChannel() {
 		case TextMessage:
 			s.BroadcastTextToAll(e.Message)
 		case JSONMessage:
-			var response JsonResponse
+			var response JSONResponse
 			response.Message = e.Message
 			s.BroadcastJSONToAll(response)
+		default:
+			log.Printf("Invalid message type %d received.\n", e.MessageType)
 		}
 	}
 }
 
-// BroadcastJSONToAll broadcasts json data to all connected Clients.
+// BroadcastJSONToAll broadcasts JSON data to all connected Clients.
 func (s *Sockets) BroadcastJSONToAll(payload any) {
 	for client := range s.Clients {
 		// broadcast to every connected client

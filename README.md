@@ -30,7 +30,8 @@ The ws.Sockets type has the following exposed methods:
 ~~~go
 SocketEndPoint(w http.ResponseWriter, r *http.Request) // A handler to for the websocket endpoint.
 ListenToWsChannel() // A goroutine that listens to the SocketsChan and pushes data to broadcast function
-BroadcastToAll(response WsJsonResponse) // Pushes data to all connected clients.
+BroadcastTextToAll(payload JSONResponse) // Pushes textual data to all connected clients.
+BroadcastJSONToAll(payload JSONResponse) // Pushes JSON data to all connected clients.
 ~~~
 
 ## Sample app
@@ -96,9 +97,10 @@ func (app *application) RandomString() {
 	for {
 		time.Sleep(3 * time.Second)
 		for k, _ := range app.ws.Clients {
-			payload := ws.WsPayload{
-				Message: t.RandomString(5),
-				Conn:    k,
+			payload := ws.Payload{
+				MessageType: ws.JSONMessage,
+				Message:     t.RandomString(5),
+				Conn:        k,
 			}
 			app.ws.ClientChan <- payload
 		}
