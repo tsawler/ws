@@ -22,7 +22,7 @@ The ws.Sockets type has two fields:
 ~~~go
 // Sockets is the main type for this library.
 type Sockets struct {
-	ClientChan chan WsPayload // Data to be handled by this library is sent to this channel.
+	ClientChan chan Payload // Data to be handled by this library is sent to this channel.
 	Clients    map[WebSocketConnection]string // A map of all connected clients.
 }
 ~~~
