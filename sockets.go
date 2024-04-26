@@ -1,7 +1,6 @@
 package ws
 
 import (
-	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
@@ -58,7 +57,7 @@ func (s *Sockets) SocketEndPoint(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
-	log.Println(fmt.Sprintf("Client Connected from %s", r.RemoteAddr))
+	log.Printf("Client Connected from %s", r.RemoteAddr)
 
 	// Create a WebSocketConnection object with the client's connection.
 	conn := WebSocketConnection{Conn: ws}
