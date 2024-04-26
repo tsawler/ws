@@ -16,16 +16,16 @@ const (
 // Sockets is the main type for this library.
 type Sockets struct {
 	ClientChan chan Payload
-	Clients    map[WebSocketConnection]string
+	Clients    map[WebSocketConnection]any
 	ErrorChan  chan error
 }
 
 // New is a factory function to return a new *Sockets object.
 func New() *Sockets {
 	return &Sockets{
-		ClientChan: make(chan Payload),                   // The channel we send ws payloads (from client) to.
-		Clients:    make(map[WebSocketConnection]string), // A map of all connected clients.
-		ErrorChan:  make(chan error),                     // A channel where errors (or nil) is sent.
+		ClientChan: make(chan Payload),                // The channel we send ws payloads (from client) to.
+		Clients:    make(map[WebSocketConnection]any), // A map of all connected clients.
+		ErrorChan:  make(chan error),                  // A channel where errors (or nil) is sent.
 	}
 }
 
