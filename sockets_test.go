@@ -14,8 +14,8 @@ func Test_New(t *testing.T) {
 	if reflect.TypeOf(s).String() != "*ws.Sockets" {
 		t.Errorf("wrong type; expected %s but got %s", "*ws.Sockets", reflect.TypeOf(s).String())
 	}
-	if reflect.TypeOf(s.ClientChan).String() != "chan ws.WsPayload" {
-		t.Errorf("wrong type; expected %s but got %s", "chan ws.WsPayload", reflect.TypeOf(s.ClientChan).String())
+	if reflect.TypeOf(s.ClientChan).String() != "chan ws.Payload" {
+		t.Errorf("wrong type; expected %s but got %s", "chan ws.Payload", reflect.TypeOf(s.ClientChan).String())
 	}
 	if reflect.TypeOf(s.Clients).String() != "map[ws.WebSocketConnection]string" {
 		t.Errorf("wrong type; expected %s but got %s", "map[ws.WebSocketConnection]string", reflect.TypeOf(s.Clients).String())
@@ -47,12 +47,12 @@ func TestWebSocketConnection(t *testing.T) {
 	}
 
 	// Create a payload.
-	payload := WsJsonResponse{
+	payload := JsonResponse{
 		Message: "hi",
 	}
 
 	// Broadcast it.
-	testWS.BroadcastToAll(payload)
+	testWS.BroadcastJSONToAll(payload)
 
 	// Read response.
 	messageType, b, err := ws.ReadMessage()
@@ -60,7 +60,7 @@ func TestWebSocketConnection(t *testing.T) {
 		t.Fatalf("%v", err)
 	}
 
-	if messageType != 1 {
+	if messageType != websocket.TextMessage {
 		t.Errorf("wrong message type; expected 1 but got %d", messageType)
 	}
 
@@ -96,9 +96,10 @@ func Test_ListenToWsChannel(t *testing.T) {
 	// fire off
 	go testWS.ListenToWsChannel()
 
-	payload := WsPayload{
-		Message: "Hello",
-		Conn:    WebSocketConnection{ws},
+	payload := Payload{
+		MessageType: JSONMessage,
+		Message:     "Hello",
+		Conn:        WebSocketConnection{ws},
 	}
 	testWS.ClientChan <- payload
 
@@ -107,7 +108,30 @@ func Test_ListenToWsChannel(t *testing.T) {
 		t.Error("failed to read")
 	}
 
-	t.Log("Bytes", string(b))
+	if !strings.Contains(string(b), "Hello") {
+		if err != nil {
+			t.Error("response JSON does not have correct text")
+		}
+	}
+
+	payload = Payload{
+		MessageType: TextMessage,
+		Message:     "Hello",
+		Conn:        WebSocketConnection{ws},
+	}
+	testWS.ClientChan <- payload
+
+	_, b, err = ws.ReadMessage()
+	if err != nil {
+		t.Error("failed to read")
+	}
+
+	if !strings.Contains(string(b), "Hello") {
+		if err != nil {
+			t.Error("response JSON does not have correct text")
+		}
+	}
+
 }
 
 func Test_listenForWS(t *testing.T) {
@@ -127,7 +151,7 @@ func Test_listenForWS(t *testing.T) {
 	defer ws.Close()
 
 	go testWS.listenForWS(&WebSocketConnection{ws})
-	payload := WsPayload{
+	payload := Payload{
 		Message: "",
 	}
 	err = ws.WriteJSON(payload)

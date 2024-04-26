@@ -7,16 +7,21 @@ import (
 	"net/http"
 )
 
+const (
+	TextMessage = 1
+	JSONMessage = 2
+)
+
 // Sockets is the main type for this library.
 type Sockets struct {
-	ClientChan chan WsPayload
+	ClientChan chan Payload
 	Clients    map[WebSocketConnection]string
 }
 
 // New is a factory function to return a new *Sockets object.
 func New() *Sockets {
 	return &Sockets{
-		ClientChan: make(chan WsPayload),                 // The channel we send ws payloads (from client) to.
+		ClientChan: make(chan Payload),                   // The channel we send ws payloads (from client) to.
 		Clients:    make(map[WebSocketConnection]string), // A map of all connected clients.
 	}
 }
@@ -28,14 +33,15 @@ var upgradeConnection = websocket.Upgrader{
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
-// WsPayload defines the data we receive from the client
-type WsPayload struct {
-	Message string              `json:"message"`
-	Conn    WebSocketConnection `json:"-"`
+// Payload defines the data we receive from the client
+type Payload struct {
+	MessageType int                 `json:"message_type"`
+	Message     string              `json:"message"`
+	Conn        WebSocketConnection `json:"-"`
 }
 
-// WsJsonResponse defines the json we send back to client
-type WsJsonResponse struct {
+// JsonResponse defines the json we send back to client
+type JsonResponse struct {
 	Message     string              `json:"message"`
 	CurrentConn WebSocketConnection `json:"-"`
 }
@@ -72,7 +78,7 @@ func (s *Sockets) listenForWS(conn *WebSocketConnection) {
 	}()
 
 	// payload is the variable we read a payload into.
-	var payload WsPayload
+	var payload Payload
 
 	// This loop will run forever, waiting for something to come
 	// in on a websocket.
@@ -88,21 +94,40 @@ func (s *Sockets) listenForWS(conn *WebSocketConnection) {
 	}
 }
 
-// ListenToWsChannel listens to the SocketsChan and pushes data to broadcast function.
+// ListenToWsChannel listens to the SocketsChan and pushes data to broadcast functions.
 func (s *Sockets) ListenToWsChannel() {
-	var response WsJsonResponse
+
 	for {
 		e := <-s.ClientChan
-		response.Message = e.Message
-		s.BroadcastToAll(response)
+
+		switch e.MessageType {
+		case TextMessage:
+			s.BroadcastTextToAll(e.Message)
+		case JSONMessage:
+			var response JsonResponse
+			response.Message = e.Message
+			s.BroadcastJSONToAll(response)
+		}
 	}
 }
 
-// BroadcastToAll broadcasts data to all connected Clients.
-func (s *Sockets) BroadcastToAll(response WsJsonResponse) {
+// BroadcastJSONToAll broadcasts json data to all connected Clients.
+func (s *Sockets) BroadcastJSONToAll(payload any) {
 	for client := range s.Clients {
 		// broadcast to every connected client
-		err := client.WriteJSON(response)
+		err := client.WriteJSON(payload)
+		if err != nil {
+			_ = client.Close()
+			delete(s.Clients, client)
+		}
+	}
+}
+
+// BroadcastTextToAll broadcasts textual data to all connected Clients.
+func (s *Sockets) BroadcastTextToAll(payload string) {
+	for client := range s.Clients {
+		// broadcast to every connected client
+		err := client.WriteMessage(websocket.TextMessage, []byte(payload))
 		if err != nil {
 			_ = client.Close()
 			delete(s.Clients, client)
