@@ -1,6 +1,8 @@
 package ws
 
 import (
+	"errors"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
@@ -16,6 +18,7 @@ const (
 type Sockets struct {
 	ClientChan chan Payload
 	Clients    map[WebSocketConnection]string
+	ErrorChan  chan error
 }
 
 // New is a factory function to return a new *Sockets object.
@@ -23,6 +26,7 @@ func New() *Sockets {
 	return &Sockets{
 		ClientChan: make(chan Payload),                   // The channel we send ws payloads (from client) to.
 		Clients:    make(map[WebSocketConnection]string), // A map of all connected clients.
+		ErrorChan:  make(chan error),                     // A channel where errors (or nil) is sent.
 	}
 }
 
@@ -57,7 +61,7 @@ type WebSocketConnection struct {
 func (s *Sockets) SocketEndPoint(w http.ResponseWriter, r *http.Request) {
 	ws, err := upgradeConnection.Upgrade(w, r, nil)
 	if err != nil {
-		log.Println(err)
+		s.ErrorChan <- err
 	}
 
 	log.Printf("Client Connected from %s", r.RemoteAddr)
@@ -89,7 +93,7 @@ func (s *Sockets) listenForWS(conn *WebSocketConnection) {
 	for {
 		err := conn.ReadJSON(&payload)
 		if err != nil {
-			// do nothing
+			s.ErrorChan <- err
 		} else {
 			// Send the incoming payload to SocketsChan.
 			payload.Conn = *conn
@@ -112,7 +116,7 @@ func (s *Sockets) ListenToWsChannel() {
 			response.Message = e.Message
 			s.BroadcastJSONToAll(response)
 		default:
-			log.Printf("Invalid message type %d received.\n", e.MessageType)
+			s.ErrorChan <- errors.New(fmt.Sprintf("invalid message type %d received\n", e.MessageType))
 		}
 	}
 }
@@ -138,6 +142,7 @@ func (s *Sockets) BroadcastTextToAll(payload string) {
 		// Broadcast to every connected client.
 		err := client.WriteMessage(websocket.TextMessage, []byte(payload))
 		if err != nil {
+			// Someone left. Remove them from the map of connected users.
 			_ = client.Close()
 			delete(s.Clients, client)
 		}

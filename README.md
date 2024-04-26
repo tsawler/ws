@@ -22,13 +22,14 @@ Create a variable of type ws.Sockets by calling the `ws.New()` function:
 ws := sockets.New()
 ~~~
 
-The ws.Sockets type has two fields:
+The ws.Sockets type has three fields:
 
 ~~~go
 // Sockets is the main type for this library.
 type Sockets struct {
-	ClientChan chan Payload // Data to be handled by this library is sent to this channel.
-	Clients    map[WebSocketConnection]string // A map of all connected clients.
+    ClientChan chan Payload // The channel that receives messages.
+    Clients    map[WebSocketConnection]string // A map of connected clients.
+    ErrorChan  chan error // A channel to send errors to.
 }
 ~~~
 
