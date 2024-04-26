@@ -72,8 +72,7 @@ func (s *Sockets) SocketEndPoint(w http.ResponseWriter, r *http.Request) {
 func (s *Sockets) listenForWS(conn *WebSocketConnection) {
 	// If this dies, just restart it.
 	defer func() {
-		if r := recover(); r != nil {
-		}
+		recover()
 	}()
 
 	// payload is the variable we read a payload into.
