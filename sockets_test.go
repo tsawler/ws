@@ -109,3 +109,29 @@ func Test_ListenToWsChannel(t *testing.T) {
 
 	t.Log("Bytes", string(b))
 }
+
+func Test_listenForWS(t *testing.T) {
+	testWS := New()
+	// Create test server.
+	s := httptest.NewServer(http.HandlerFunc(testWS.SocketEndPoint))
+	defer s.Close()
+
+	// Convert http//: to ws://.
+	u := "ws" + strings.TrimPrefix(s.URL, "http")
+
+	// Connect to the server.
+	ws, _, err := websocket.DefaultDialer.Dial(u, nil)
+	if err != nil {
+		t.Fatalf("%v", err)
+	}
+	defer ws.Close()
+
+	go testWS.listenForWS(&WebSocketConnection{ws})
+	payload := WsPayload{
+		Message: "",
+	}
+	err = ws.WriteJSON(payload)
+	if err != nil {
+		t.Fatalf("%v", err)
+	}
+}
