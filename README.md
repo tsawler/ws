@@ -1,6 +1,5 @@
 <a href="https://golang.org"><img src="https://img.shields.io/badge/powered_by-Go-3362c2.svg?style=flat-square" alt="Built with GoLang"></a>
 [![License](http://img.shields.io/badge/license-mit-blue.svg?style=flat-square)](https://github.com/tsawler/persist/blob/main/LICENSE.md)
-[![Go Report Card](https://goreportcard.com/badge/github.com/tsawler/ws)](https://goreportcard.com/report/github.com/tsawler/ws)
 <a href="https://pkg.go.dev/github.com/tsawler/ws"><img src="https://img.shields.io/badge/godoc-reference-%23007d9c.svg"></a>
 
 # ws
