@@ -115,7 +115,7 @@ func (s *Sockets) ListenToWsChannel() {
 			response.Message = e.Message
 			s.BroadcastJSONToAll(response)
 		default:
-			s.ErrorChan <- fmt.Errorf("invalid message type %d received\n", e.MessageType)
+			s.ErrorChan <- fmt.Errorf("invalid message type %d received", e.MessageType)
 		}
 	}
 }
