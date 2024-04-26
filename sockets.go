@@ -1,7 +1,6 @@
 package ws
 
 import (
-	"errors"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
@@ -116,7 +115,7 @@ func (s *Sockets) ListenToWsChannel() {
 			response.Message = e.Message
 			s.BroadcastJSONToAll(response)
 		default:
-			s.ErrorChan <- errors.New(fmt.Sprintf("invalid message type %d received\n", e.MessageType))
+			s.ErrorChan <- fmt.Errorf("invalid message type %d received\n", e.MessageType)
 		}
 	}
 }
