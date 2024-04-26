@@ -4,6 +4,7 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
+	"sync"
 )
 
 const (
@@ -31,6 +32,8 @@ var upgradeConnection = websocket.Upgrader{
 	WriteBufferSize: 1024,
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
+
+var clientsMutex sync.Mutex
 
 // Payload defines the data we receive from the client.
 type Payload struct {
@@ -61,8 +64,11 @@ func (s *Sockets) SocketEndPoint(w http.ResponseWriter, r *http.Request) {
 
 	// Create a WebSocketConnection object with the client's connection.
 	conn := WebSocketConnection{Conn: ws}
+
 	// Add the client to the map of connected Clients.
+	clientsMutex.Lock()
 	s.Clients[conn] = ""
+	clientsMutex.Unlock()
 
 	// Start listening for this client.
 	go s.listenForWS(&conn)
@@ -113,6 +119,7 @@ func (s *Sockets) ListenToWsChannel() {
 
 // BroadcastJSONToAll broadcasts JSON data to all connected Clients.
 func (s *Sockets) BroadcastJSONToAll(payload any) {
+	clientsMutex.Lock()
 	for client := range s.Clients {
 		// Broadcast to every connected client.
 		err := client.WriteJSON(payload)
@@ -121,10 +128,12 @@ func (s *Sockets) BroadcastJSONToAll(payload any) {
 			delete(s.Clients, client)
 		}
 	}
+	clientsMutex.Unlock()
 }
 
 // BroadcastTextToAll broadcasts textual data to all connected Clients.
 func (s *Sockets) BroadcastTextToAll(payload string) {
+	clientsMutex.Lock()
 	for client := range s.Clients {
 		// Broadcast to every connected client.
 		err := client.WriteMessage(websocket.TextMessage, []byte(payload))
@@ -133,4 +142,5 @@ func (s *Sockets) BroadcastTextToAll(payload string) {
 			delete(s.Clients, client)
 		}
 	}
+	clientsMutex.Unlock()
 }

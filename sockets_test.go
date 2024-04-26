@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 )
 
 func Test_New(t *testing.T) {
@@ -23,8 +24,6 @@ func Test_New(t *testing.T) {
 }
 
 func TestWebSocketConnection(t *testing.T) {
-	testWS := New()
-
 	// Create test server.
 	s := httptest.NewServer(http.HandlerFunc(testWS.SocketEndPoint))
 	defer s.Close()
@@ -40,11 +39,7 @@ func TestWebSocketConnection(t *testing.T) {
 	defer ws.Close()
 
 	// Wait for our connected client to show up as a map entry in testWs.Clients.
-	for {
-		if len(testWS.Clients) > 0 {
-			break
-		}
-	}
+	time.Sleep(10 * time.Millisecond)
 
 	// Create a payload.
 	payload := JSONResponse{
@@ -70,8 +65,6 @@ func TestWebSocketConnection(t *testing.T) {
 }
 
 func Test_ListenToWsChannel(t *testing.T) {
-	testWS := New()
-
 	// Create test server.
 	s := httptest.NewServer(http.HandlerFunc(testWS.SocketEndPoint))
 	defer s.Close()
@@ -85,13 +78,6 @@ func Test_ListenToWsChannel(t *testing.T) {
 		t.Fatalf("%v", err)
 	}
 	defer ws.Close()
-
-	// Wait for our connected client to show up as a map entry in testWs.Clients.
-	for {
-		if len(testWS.Clients) > 0 {
-			break
-		}
-	}
 
 	// fire off
 	go testWS.ListenToWsChannel()
@@ -135,7 +121,6 @@ func Test_ListenToWsChannel(t *testing.T) {
 }
 
 func Test_listenForWS(t *testing.T) {
-	testWS := New()
 	// Create test server.
 	s := httptest.NewServer(http.HandlerFunc(testWS.SocketEndPoint))
 	defer s.Close()
