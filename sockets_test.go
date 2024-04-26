@@ -18,8 +18,8 @@ func Test_New(t *testing.T) {
 	if reflect.TypeOf(s.ClientChan).String() != "chan ws.Payload" {
 		t.Errorf("wrong type; expected %s but got %s", "chan ws.Payload", reflect.TypeOf(s.ClientChan).String())
 	}
-	if reflect.TypeOf(s.Clients).String() != "map[ws.WebSocketConnection]string" {
-		t.Errorf("wrong type; expected %s but got %s", "map[ws.WebSocketConnection]string", reflect.TypeOf(s.Clients).String())
+	if reflect.TypeOf(s.Clients).String() != "map[ws.WebSocketConnection]interface {}" {
+		t.Errorf("wrong type; expected %s but got %s", "map[ws.WebSocketConnection]interface {}", reflect.TypeOf(s.Clients).String())
 	}
 }
 
