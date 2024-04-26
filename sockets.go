@@ -33,7 +33,7 @@ var upgradeConnection = websocket.Upgrader{
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
-// Payload defines the data we receive from the client
+// Payload defines the data we receive from the client.
 type Payload struct {
 	MessageType int                 `json:"message_type"`
 	Message     string              `json:"message"`
@@ -46,12 +46,12 @@ type JSONResponse struct {
 	CurrentConn WebSocketConnection `json:"-"`
 }
 
-// WebSocketConnection holds the websocket connection
+// WebSocketConnection is a simple wrapper which holds a websocket connection.
 type WebSocketConnection struct {
 	*websocket.Conn
 }
 
-// SocketEndPoint handles websocket connections
+// SocketEndPoint handles websocket connections.
 func (s *Sockets) SocketEndPoint(w http.ResponseWriter, r *http.Request) {
 	ws, err := upgradeConnection.Upgrade(w, r, nil)
 	if err != nil {
@@ -116,7 +116,7 @@ func (s *Sockets) ListenToWsChannel() {
 // BroadcastJSONToAll broadcasts JSON data to all connected Clients.
 func (s *Sockets) BroadcastJSONToAll(payload any) {
 	for client := range s.Clients {
-		// broadcast to every connected client
+		// Broadcast to every connected client.
 		err := client.WriteJSON(payload)
 		if err != nil {
 			_ = client.Close()
@@ -128,7 +128,7 @@ func (s *Sockets) BroadcastJSONToAll(payload any) {
 // BroadcastTextToAll broadcasts textual data to all connected Clients.
 func (s *Sockets) BroadcastTextToAll(payload string) {
 	for client := range s.Clients {
-		// broadcast to every connected client
+		// Broadcast to every connected client.
 		err := client.WriteMessage(websocket.TextMessage, []byte(payload))
 		if err != nil {
 			_ = client.Close()
