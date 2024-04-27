@@ -42,12 +42,14 @@ var clientsMutex sync.Mutex
 type Payload struct {
 	MessageType int                 `json:"message_type"`
 	Message     string              `json:"message"`
+	Data        any                 `json:"data,omitempty"`
 	Conn        WebSocketConnection `json:"-"`
 }
 
 // JSONResponse defines the JSON we send back to client
 type JSONResponse struct {
 	Message     string              `json:"message"`
+	Data        any                 `json:"data,omitempty"`
 	CurrentConn WebSocketConnection `json:"-"`
 }
 
