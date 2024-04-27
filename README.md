@@ -49,5 +49,33 @@ This is what client side javascript will connect to.
 3. `BroadcastTextToAll`: sends a textual message to all connected clients.
 4. `BroadcastJSONToAll`: sends a message in JSON format to all connected clients.
 
+To *push data* over websockets from the client to the server, JSON must be marshalable into the 
+`ws.Payload` type:
+
+~~~go
+// Payload defines the data we receive from the client.
+type Payload struct {
+	MessageType int                 `json:"message_type"`
+	Message     string              `json:"message"`
+	Data        any                 `json:"data,omitempty"`
+	Conn        WebSocketConnection `json:"-"`
+}
+~~~
+
+Obviously, custom data types can simply be put in the `Data` field.
+
+Data that comes back from the server to the client must conform to the `ws.JSONResponse` type:
+
+~~~go
+// JSONResponse defines the JSON we send back to client
+type JSONResponse struct {
+	Message     string              `json:"message"`
+	Data        any                 `json:"data,omitempty"`
+	CurrentConn WebSocketConnection `json:"-"`
+}
+~~~
+
+Again, custom data of any type can be put into the `Data` field of this type.
+
 ## Sample app
 A working web application can be [found here](https://github.com/tsawler/ws-sample-app).
