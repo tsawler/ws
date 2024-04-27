@@ -27,19 +27,19 @@ The `ws.Sockets` type has three fields:
 ~~~go
 // Sockets is the main type for this library.
 type Sockets struct {
-    ClientChan chan Payload // The channel that receives messages.
-    Clients    map[WebSocketConnection]any // A map of connected clients.
-    ErrorChan  chan error // A channel to send errors to.
+    ClientChan chan Payload                 // The channel that receives messages.
+    Clients    map[WebSocketConnection]any  // A map of connected clients.
+    ErrorChan  chan error                   // A channel to send errors to.
 }
 ~~~
 
 The `ws.Sockets` type has the following exposed methods:
 
 ~~~go
-SocketEndPoint(w http.ResponseWriter, r *http.Request) // A handler for the websocket endpoint.
-ListenToWsChannel() // A goroutine that listens to the SocketsChan and pushes data to broadcast function.
-BroadcastTextToAll(payload JSONResponse) // Pushes textual data to all connected clients.
-BroadcastJSONToAll(payload JSONResponse) // Pushes JSON data to all connected clients.
+SocketEndPoint(w http.ResponseWriter, r *http.Request)  // A handler for the websocket endpoint.
+ListenToWsChannel()                                     // A goroutine that listens to the SocketsChan and pushes data to broadcast function.
+BroadcastTextToAll(payload JSONResponse)                // Pushes textual data to all connected clients.
+BroadcastJSONToAll(payload JSONResponse)                // Pushes JSON data to all connected clients.
 ~~~
 
 1. `SocketEndPoint`: A handler used to listen for (and upgrade) http(s) connections to ws(s) connections. 
@@ -55,10 +55,10 @@ To *push data* over websockets from the client to the server, JSON must be able 
 ~~~go
 // Payload defines the data we receive from the client.
 type Payload struct {
-	MessageType int                 `json:"message_type"`
-	Message     string              `json:"message"`
-	Data        any                 `json:"data,omitempty"`
-	Conn        WebSocketConnection `json:"-"`
+    MessageType int                 `json:"message_type"`   // ws.TextMessage or 1 - text message; ws.JSONMessage or 2: JSON message.
+    Message     string              `json:"message"`        // The message.
+    Data        any                 `json:"data,omitempty"` // A field for custom structured data.
+    Conn        WebSocketConnection `json:"-"`              // Useful when you want to send a message to everyone except the originator.
 }
 ~~~
 
