@@ -2,7 +2,7 @@
 [![License](http://img.shields.io/badge/license-mit-blue.svg?style=flat-square)](https://github.com/tsawler/persist/blob/main/LICENSE.md)
 <a href="https://pkg.go.dev/github.com/tsawler/ws"><img src="https://img.shields.io/badge/godoc-reference-%23007d9c.svg"></a>
 ![Tests](https://github.com/tsawler/ws/actions/workflows/tests.yml/badge.svg)
-[![Go Report Card](https://goreportcard.com/badge/github.com/tsawler/ws)](https://goreportcard.com/report/github.com/tsawler/ws)
+
 # ws
 
 Package ws is a simple library that makes it easy to use WebSockets (specifically 
