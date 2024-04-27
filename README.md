@@ -16,7 +16,7 @@ go get github.com/tsawler/ws
 ~~~
 
 ## Usage
-Create a variable of `type ws.Sockets` by calling the `ws.New()` function:
+Create a variable of `ws.Sockets` by calling the `ws.New()` function:
 
 ~~~go
 ws := sockets.New()
