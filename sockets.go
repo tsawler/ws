@@ -29,13 +29,15 @@ func New() *Sockets {
 	}
 }
 
-// upgradeConnection is the upgraded connection needed for ws.
+// upgradeConnection is the upgraded connection needed for websockets.
 var upgradeConnection = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
+// clientsMutex is used to lock/unlock the map of connected clients in order to avoid
+// race conditions.
 var clientsMutex sync.Mutex
 
 // Payload defines the data we receive from the client.
@@ -129,6 +131,7 @@ func (s *Sockets) BroadcastJSONToAll(payload any) {
 		// Broadcast to every connected client.
 		err := client.WriteJSON(payload)
 		if err != nil {
+			// Someone left. Remove them from the map of connected users.
 			_ = client.Close()
 			delete(s.Clients, client)
 		}
