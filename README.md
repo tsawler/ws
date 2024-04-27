@@ -16,13 +16,13 @@ go get github.com/tsawler/ws
 ~~~
 
 ## Usage
-Create a variable of type ws.Sockets by calling the `ws.New()` function:
+Create a variable of `type ws.Sockets` by calling the `ws.New()` function:
 
 ~~~go
 ws := sockets.New()
 ~~~
 
-The ws.Sockets type has three fields:
+The `ws.Sockets` type has three fields:
 
 ~~~go
 // Sockets is the main type for this library.
@@ -33,7 +33,7 @@ type Sockets struct {
 }
 ~~~
 
-The ws.Sockets type has the following exposed methods:
+The `ws.Sockets` type has the following exposed methods:
 
 ~~~go
 SocketEndPoint(w http.ResponseWriter, r *http.Request) // A handler for the websocket endpoint.
@@ -42,14 +42,14 @@ BroadcastTextToAll(payload JSONResponse) // Pushes textual data to all connected
 BroadcastJSONToAll(payload JSONResponse) // Pushes JSON data to all connected clients.
 ~~~
 
-1. `SocketEndPoint`: You'll need a handler to listen for (and upgrade) http(s) connections to ws(s) connections. 
+1. `SocketEndPoint`: A handler used to listen for (and upgrade) http(s) connections to ws(s) connections. 
 This is what client side javascript will connect to.
 2. `ListenToWsChannel`: Run this concurrently as a goroutine. It listens to the `ClientChan` 
 (type `chan Payload`) in the `Sockets` type and sends client payloads to the appropriate broadcast method.
 3. `BroadcastTextToAll`: sends a textual message to all connected clients.
 4. `BroadcastJSONToAll`: sends a message in JSON format to all connected clients.
 
-To *push data* over websockets from the client to the server, JSON must be marshalable into the 
+To *push data* over websockets from the client to the server, JSON must be able to be marshalled into the 
 `ws.Payload` type:
 
 ~~~go
