@@ -1,3 +1,6 @@
+// Package ws is a simple library that makes it easy to use WebSockets
+// (specifically Gorilla Websockets) in your Go application.
+
 package ws
 
 import (
@@ -9,30 +12,39 @@ import (
 )
 
 const (
-	TextMessage = 1
-	JSONMessage = 2
+	TextMessage = 1 // text format.
+	JSONMessage = 2 // JSON format.
 )
 
 // Sockets is the main type for this library.
 type Sockets struct {
-	ClientChan chan Payload
-	Clients    map[WebSocketConnection]any
-	ErrorChan  chan error
+	ClientChan      chan Payload                // The channel which receives message payloads.
+	Clients         map[WebSocketConnection]any // A map of all connected clients.
+	ErrorChan       chan error                  // A channel which receives errors.
+	ReadBufferSize  int                         // I/O read buffer size in bytes.
+	WriteBufferSize int                         // I/O write buffer size in bytes.
 }
+
+var (
+	ReadBufferSize  = 1024 // Set a sensible default of 1024 bytes for read buffer.
+	WriteBufferSize = 1024 // Set a sensible default of 1024 bytes for write buffer.
+)
 
 // New is a factory function to return a new *Sockets object.
 func New() *Sockets {
 	return &Sockets{
-		ClientChan: make(chan Payload),                // The channel we send ws payloads (from client) to.
-		Clients:    make(map[WebSocketConnection]any), // A map of all connected clients.
-		ErrorChan:  make(chan error),                  // A channel where errors (or nil) is sent.
+		ClientChan:      make(chan Payload),
+		Clients:         make(map[WebSocketConnection]any),
+		ErrorChan:       make(chan error),
+		ReadBufferSize:  ReadBufferSize,
+		WriteBufferSize: WriteBufferSize,
 	}
 }
 
 // upgradeConnection is the upgraded connection needed for websockets.
 var upgradeConnection = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
+	ReadBufferSize:  ReadBufferSize,
+	WriteBufferSize: WriteBufferSize,
 	CheckOrigin:     func(r *http.Request) bool { return true },
 }
 
@@ -62,6 +74,7 @@ type WebSocketConnection struct {
 
 // SocketEndPoint handles websocket connections.
 func (s *Sockets) SocketEndPoint(w http.ResponseWriter, r *http.Request) {
+	// Upgrade the connection to the WebSocket protocol.
 	ws, err := upgradeConnection.Upgrade(w, r, nil)
 	if err != nil {
 		s.ErrorChan <- err
