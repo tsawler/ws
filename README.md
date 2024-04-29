@@ -67,7 +67,7 @@ type Payload struct {
 
 Obviously, custom data types can simply be put in the `Data` field.
 
-Data that comes back from the server to the client must conform to the `ws.JSONResponse` type:
+JSON Data that comes back from the server to the client will be in the `ws.JSONResponse` type:
 
 ~~~go
 // JSONResponse defines the JSON we send back to client
