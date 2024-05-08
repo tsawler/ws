@@ -78,6 +78,7 @@ func (s *Sockets) SocketEndPoint(w http.ResponseWriter, r *http.Request) {
 	ws, err := upgradeConnection.Upgrade(w, r, nil)
 	if err != nil {
 		s.ErrorChan <- err
+		return
 	}
 
 	log.Printf("Client Connected from %s", r.RemoteAddr)
